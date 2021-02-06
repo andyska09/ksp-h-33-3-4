@@ -46,14 +46,18 @@ def initTest(start, end):
 
 def extractTestMap(mapa, start, end):
     newMap = []
+    x = 0
+    y = 0
     for i in range(start[0], end[0] + 1):
         newMap.append(array('H'))
         for j in range(start[1], end[1] + 1):
-            newMap[i].append(mapa[i][j])
+            newMap[x].append(mapa[i][j])
+            y += 1
+    x += 1
     return newMap
 
 
-mapa = initTest([0, 0], [1, 10])
+mapa = initTest([40, 40], [80, 80])
 
 count = 0
 totalPrice = 0
