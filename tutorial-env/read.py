@@ -23,25 +23,37 @@ def init():
     return mapa
 
 
-def initTest():
-    S = 16384
+def initTest(start, end):
+    S = end[1] + 1
     mapa = []
     print("start")
-    for y in range(1000, 1001):
-        if y < 1000:
-            continue
+    for y in range(end[0]+1):
+        # Musíme dát pozor na endianitu (data jsou
+        # little-endian) a tak načtení svěříme numpy
         numpy_radek = numpy.fromfile(
             "/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/01.in",
             dtype="<u2",  # unsigned 2bajtová čísla
             count=S       # v little-endian(<)
         )
+        # Pro rychlejší přístup k prvkům převedeme
+        # na interní Pythoní pole
         radek = array('H')  # minimálně 2b číslo
         radek.fromlist(numpy_radek.tolist())
         mapa.append(radek)
+    extractTestMap(mapa, start, end)
     return mapa
 
 
-mapa = initTest()
+def extractTestMap(mapa, start, end):
+    newMap = []
+    for i in range(start[0], end[0] + 1):
+        newMap.append(array('H'))
+        for j in range(start[1], end[1] + 1):
+            newMap[i].append(mapa[i][j])
+    return newMap
+
+
+mapa = initTest([0, 0], [1, 10])
 
 count = 0
 totalPrice = 0
