@@ -1,5 +1,7 @@
+import os
 import numpy
 import time
+from datetime import datetime
 from array import array
 
 
@@ -19,51 +21,66 @@ def init():
     return mapa
 
 
-def initTest(start, end):
-    S = end[1] + 1
+def initTest():
+    f = open("test.txt", "r")
     mapa = []
-    print("start")
-    with open("/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/01.in", "rb") as input_file:
-        for y in range(end[0]+1):
-            if y < start[0]:
-                numpy_radek = numpy.fromfile(
-                    input_file,
-                    dtype="<u2",
-                    count=0
-                )
-            else:
-                numpy_radek = numpy.fromfile(
-                    input_file,
-                    dtype="<u2",
-                    count=S
-                )
-                radek = array('H')
-                radek.fromlist(numpy_radek.tolist())
-                mapa.append(radek)
-    return extractTestMap(mapa, start, end)
+    for i in f:
+        mapa.append([i])
+    for i in range(len(mapa)):
+        mapa[i] = numpy.array(list(map(int, mapa[i][0].split())))
+    return mapa
 
 
-def extractTestMap(mapa, start, end):
+def createTestMap(start, end):
+    mapa = init()
     newMap = []
     x = 0
-    for i in range(start[0], end[0] + 1):
-        newMap.append(array('H'))
-        for j in range(start[1], end[1] + 1):
-            newMap[x].append(mapa[x][j])
+    for i in range(start[0], end[0]):
+        newMap.append([])
+        for j in range(start[1], end[1]):
+            newMap[x].append(mapa[i][j])
         x += 1
-    return newMap
+
+    result = []
+    for i in range(len(newMap)):
+        for j in range(len(newMap[0])):
+            newMap[i][j] = str(newMap[i][j])
+
+    for i in range(len(newMap)):
+        result.append(" ".join(newMap[i]))
+
+    outputContent = "\n".join(result)
+    print("saving test map to file:", "\n", outputContent)
+
+    f = open("test.txt", "w")
+    f.write(outputContent)
+    f.close()
+    return
+
+
+def saveOutput(outputContent):
+    savePath = "/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/outputs"
+    name = datetime.now().strftime("%y%m%d-%H-%M-%S")
+    completeName = os.path.join(savePath, name+"-out.txt")
+    f = open(completeName, "w")
+    f.write(outputContent)
+    f.close()
 
 
 print("start")
-start = time.time()
-mapa = initTest([8000, 10000], [8020, 10020])
-end = time.time()
-print("done init in:", (end - start)*1000, "ms")
-totalValue = 0
+startTime = time.time()
 
-start = time.time()
-for i in range(len(mapa)):
-    for j in range(len(mapa[0])):
-        totalValue += mapa[i][j]
-end = time.time()
-print("done main in", (end - start)*1000, '\n', totalValue)
+#mapa = init()
+#createTestMap([11, 12356], [26, 12376])
+mapa = initTest()
+
+endTime = time.time()
+
+print("done init in:", (endTime - startTime)*1000, "ms")
+startTime = time.time()
+print(mapa)
+
+
+# saveOutput(outputContent)
+endTime = time.time()
+print("done main in", (endTime - startTime)*1000, "ms")
