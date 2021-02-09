@@ -68,12 +68,14 @@ def saveOutput(outputContent):
 
 
 def main(mapa):
+    count = 0
     housesCoordinates = {}
     for i in range(len(mapa)):
         housesCoordinates[i] = {}
         for j in range(len(mapa[0])):
             if mapa[i][j] != 0:
-                housesCoordinates[i][j] = mapa[i][j]
+                count += 1
+                #housesCoordinates[i][j] = mapa[i][j]
     return housesCoordinates
 
 
@@ -82,7 +84,7 @@ startTime = time.time()
 
 #mapa = init()
 #createTestMap([11, 12356], [26, 12376])
-mapa = initTest()
+#mapa = initTest()
 
 endTime = time.time()
 print("done init in:", (endTime - startTime)*1000, "ms")
@@ -90,8 +92,14 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 startTime = time.time()
 # print(mapa)
 
-result = main(mapa)
-print(result)
+#result = main(mapa)
+# print(result)
+
+count = 0
+for i in range(16384):
+    for j in range(16384):
+        count += 1
+print(count)
 # saveOutput(outputContent)
 endTime = time.time()
 print("done main in", (endTime - startTime)*1000, "ms")
