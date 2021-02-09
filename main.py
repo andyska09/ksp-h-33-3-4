@@ -5,6 +5,33 @@ from datetime import datetime
 from array import array
 
 
+class House:
+    def __init__(self, x, y, price):
+        self.x = x
+        self.y = y
+        self.price = price
+        self.numberOfNeighbours = 0
+
+    def countNeighbours(self, houseCoordinates, lastCoor):
+        # x-před
+        start = 0
+        end = self.x + 500
+        # x-za
+        if (self.x - 500 >= 0):
+            start = self.x - 500
+
+        for row in range(start, end):
+            if not(row in houseCoordinates):
+                break
+
+            for j in houseCoordinates[row]:
+                if j > self.y + 500:
+                    break
+                elif not(j < self.y - 500) and (row != self.x or j != self.y):
+                    self.numberOfNeighbours += 1
+        return [self.x, self.y]
+
+
 def init():
     S = 16384
     mapa = []
@@ -69,20 +96,32 @@ def saveOutput(outputContent):
 
 def main(mapa):
     count = 0
-    housesCoordinates = {}
+    houseCoordinates = {}
     for i in range(len(mapa)):
-        housesCoordinates[i] = {}
+        houseCoordinates[i] = {}
         for j in range(len(mapa[0])):
             if mapa[i][j] != 0:
-                count += 1
-                #housesCoordinates[i][j] = mapa[i][j]
-    return housesCoordinates
+                houseCoordinates[i][j] = House(i, j, mapa[i][j])
+    print('starting algorithm')
+    countCoveregeOfHouses(houseCoordinates)
+    return count
+
+
+def countCoveregeOfHouses(houseCoordinates):
+    startTime = time.time()
+    lastCoor = [0, 0]
+    for x in houseCoordinates:
+        for y in houseCoordinates[x]:
+            lastCoor = houseCoordinates[x][y].countNeighbours(
+                houseCoordinates, lastCoor)
+    endTime = time.time()
+    print("done first line in", (endTime - startTime)*1000, "ms")
 
 
 print("start")
 startTime = time.time()
 
-#mapa = init()
+mapa = init()
 #createTestMap([11, 12356], [26, 12376])
 #mapa = initTest()
 
@@ -92,14 +131,11 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 startTime = time.time()
 # print(mapa)
 
-#result = main(mapa)
-# print(result)
+result = main(mapa)
+mapa = []
+print(result)
 
-count = 0
-for i in range(16384):
-    for j in range(16384):
-        count += 1
-print(count)
+
 # saveOutput(outputContent)
 endTime = time.time()
 print("done main in", (endTime - startTime)*1000, "ms")
