@@ -13,22 +13,59 @@ class House:
         self.numberOfNeighbours = 0
 
     def countNeighbours(self, houseCoordinates, lastCoor):
-        # x-před
-        start = 0
-        end = self.x + 500
-        # x-za
-        if (self.x - 500 >= 0):
-            start = self.x - 500
-
-        for row in range(start, end):
-            if not(row in houseCoordinates):
-                break
-
-            for j in houseCoordinates[row]:
-                if j > self.y + 500:
+        countToRemove = 0
+        countToAdd = 0
+        if lastCoor[0] == self.x and lastCoor[1] == self.y:
+            for row in range(0, 501):
+                if not(row in houseCoordinates):
                     break
-                elif not(j < self.y - 500) and (row != self.x or j != self.y):
-                    self.numberOfNeighbours += 1
+                for j in houseCoordinates[row]:
+                    if not(row == 0 and j == 0):
+                        self.numberOfNeighbours += 1
+        else:
+            startX01 = 0
+            endX01 = 0
+            if (self.x - 500 >= 0) and (lastCoor[0] - 500 >= 0):
+                startX01 = self.x - 500
+                endX01 = self.x - 500 + (self.x - lastCoor[0])
+
+            startX02 = lastCoor[0] + 500
+            endX02 = self.x + 500
+            if lastCoor[0] + 500 >= len(houseCoordinates) - 1:
+                startX02 = len(houseCoordinates) - 1
+                endX02 = len(houseCoordinates) - 1
+
+            startY01 = 0
+            endY01 = 0
+            if self.y - 500 < 0:
+                if lastCoor[1] > self.y:
+                    startY01 = 0
+                    endY01 = 0
+            elif (self.y - 500 >= 0) and (lastCoor[1] - 500 >= 0):
+                startY01 = self.y - 500
+                endX01 = self.x - 500 + (self.x - lastCoor[0])
+
+            startY02 = lastCoor[1] + 500
+            endY02 = self.y + 500
+            if lastCoor[1] + 500 >= len(houseCoordinates[0]) - 1:
+                startY02 = len(houseCoordinates[0]) - 1
+                endY02 = len(houseCoordinates[0]) - 1
+
+            for row in range(startX01, endX01):
+                if not(row in houseCoordinates):
+                    break
+                for j in range(startY01, endY01):
+                    if j in houseCoordinates[row]:
+                        countToRemove += 1
+            for row in range(startX02, endX02):
+                if not(row in houseCoordinates):
+                    break
+                for j in range(startY02, endY02):
+                    if j in houseCoordinates[row]:
+                        countToAdd += 1
+
+            self.numberOfNeighbours = houseCoordinates[lastCoor[0]
+                                                       ][lastCoor[1]].numberOfNeighbours - countToRemove + countToAdd
         return [self.x, self.y]
 
 
@@ -109,7 +146,7 @@ def main(mapa):
 
 def countCoveregeOfHouses(houseCoordinates):
     startTime = time.time()
-    lastCoor = [0, 0]
+    lastCoor = [0, 8260]
     for x in houseCoordinates:
         for y in houseCoordinates[x]:
             lastCoor = houseCoordinates[x][y].countNeighbours(
