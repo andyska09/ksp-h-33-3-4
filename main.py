@@ -11,59 +11,76 @@ class House:
         self.y = y
         self.price = price
         self.numberOfNeighbours = 0
+        self.costOfNeighbours = 0
 
     def countNeighbours(self, houseCoordinates, lastCoor, k):
         countToRemove = 0
         countToAdd = 0
+        costToAdd = 0
+        costToRemove = 0
         if lastCoor[0] == self.x and lastCoor[1] == self.y:
             startTime = time.time()
-            for row in range(0, self.x + k + 1):
-                for j in houseCoordinates[row]:
-                    if j != self.y or row != self.x:
-                        if j <= self.y + k:
-                            self.numberOfNeighbours += 1
-                        else:
-                            break
+            self.countSquare(0, self.x + k + 1, houseCoordinates, k)
             endTime = time.time()
             print("first element:", (endTime - startTime)
                   * 1000, "ms", self.x, self.y)
         else:
             if lastCoor[0] != self.x:
-                print("new-line")
-                for row in range(max(0, self.x - k), min(len(houseCoordinates) - 1, self.x + k + 1)):
-                    for j in houseCoordinates[row]:
-                        if j != self.y or row != self.x:
-                            if j <= self.y + k:
-                                self.numberOfNeighbours += 1
-                            else:
-                                break
+                # print("new-line")
+                self.countSquare(max(
+                    0, self.x - k), min(len(houseCoordinates), self.x + k + 1), houseCoordinates, k)
             else:
-                startY01 = max(0, self.y - k - 1)
-                endY01 = max(0, self.y - k)
-                startY02 = lastCoor[1] + k + 1
-                endY02 = self.y + k + 1
-
-                startX = max(0, self.x - k)
-                endX = min(len(houseCoordinates) - 1, self.x + k + 1)
-
-                startTime = time.time()
-                if startY01 != endY01:
-                    for row in range(startX, endX):
-                        if startY01 in houseCoordinates[row]:
-                            countToRemove += 1
-                        if startY02 in houseCoordinates[row]:
-                            countToAdd += 1
+                if self.y - lastCoor[1] > k:
+                    startTime = time.time()
+                    self.countSquare(max(0, self.x - k),
+                                     min(len(houseCoordinates), self.x + k + 1), houseCoordinates, k)
+                    endTime = time.time()
+                    #print("count square:", (endTime - startTime)*1000, "ms")
                 else:
-                    for row in range(startX, endX):
-                        if startY02 in houseCoordinates[row]:
-                            countToAdd += 1
+                    startY01 = max(0, lastCoor[1] - k)
+                    endY01 = max(0, self.y - k)
 
-                endTime = time.time()
-                #print("second element:", (endTime - startTime)*1000, "ms")
-                self.numberOfNeighbours = houseCoordinates[lastCoor[0]
-                                                           ][lastCoor[1]].numberOfNeighbours - countToRemove + countToAdd
-        print(self.numberOfNeighbours)
+                    startY02 = min(16384, lastCoor[1] + k + 1)
+                    endY02 = min(16384, self.y + k + 1)
+
+                    startX = max(0, self.x - k)
+                    endX = min(len(houseCoordinates), self.x + k + 1)
+
+                    startTime = time.time()
+                    if startY01 != endY01:
+                        for row in range(startX, endX):
+                            for j in range(startY01, endY01):
+                                if j in houseCoordinates[row]:
+                                    countToRemove += 1
+                                    costToRemove += houseCoordinates[row][j].price
+                    endTime = time.time()
+                    print("time to remove:", (endTime - startTime)*1000, "ms")
+                    startTime = time.time()
+                    for row in range(startX, endX):
+                        for j in range(startY02, endY02):
+                            if j in houseCoordinates[row]:
+                                countToAdd += 1
+                                costToAdd += houseCoordinates[row][j].price
+                    endTime = time.time()
+                    print("time to add:", (endTime - startTime)*1000, "ms")
+                    self.numberOfNeighbours = max(
+                        0, houseCoordinates[lastCoor[0]][lastCoor[1]].numberOfNeighbours - countToRemove + countToAdd)
+                    self.costOfNeighbours = max(
+                        0, houseCoordinates[lastCoor[0]][lastCoor[1]].costOfNeighbours - costToRemove + costToAdd)
+        # print(self.numberOfNeighbours)
         return [self.x, self.y]
+
+    def countSquare(self, startX, endX, houseCoordinates, k):
+        startY = max(0, self.y - k)
+        endY = self.y + k
+        for row in range(startX, endX):
+            for j in houseCoordinates[row]:
+                if j >= startY:
+                    if j <= endY:
+                        self.numberOfNeighbours += 1
+                        self.costOfNeighbours += houseCoordinates[row][j].price
+                    else:
+                        break
 
 
 def init():
@@ -83,7 +100,7 @@ def init():
 
 
 def initTest():
-    f = open("test.txt", "r")
+    f = open("test02.txt", "r")
     mapa = []
     for i in f:
         mapa.append([i])
@@ -132,21 +149,44 @@ def main(mapa):
     count = 0
     houseCoordinates = {}
     startTime = time.time()
-    for i in range(len(mapa)):
+    numberRows = len(mapa)
+    numberCollumns = len(mapa[0])
+
+    for i in range(numberRows):
+        #startTime01 = time.time()
         houseCoordinates[i] = {}
-        for j in range(len(mapa[0])):
+        for j in range(numberCollumns):
             if mapa[i][j] != 0:
                 houseCoordinates[i][j] = House(i, j, mapa[i][j])
+        #endTime01 = time.time()
+        #print("finished line init:", (endTime01 - startTime01)*1000, "ms")
 
     endTime = time.time()
     print("finished dict init:", (endTime - startTime)*1000, "ms")
 
     print('starting algorithm')
-    #startTime = time.time()
-    # for y in houseCoordinates[0]:
-    #    count += houseCoordinates[0][y].price
-    ##endTime = time.time()
-    #print("first element:", (endTime - startTime)*1000, "ms")
+    startTime = time.time()
+    countOfN = []
+    k = 500
+    for i in range(numberRows):
+        print(i)
+        countOfN.append([])
+        for j in range(numberCollumns):
+            countOfN[i].append(0)
+            if j == 0:
+                for y in range(k + 1):
+                    if mapa[i][y] != 0:
+                        countOfN[i][0] += 1
+            else:
+                if j < numberCollumns - k:
+                    if mapa[i][j + k] != 0:
+                        countOfN[i][j] = countOfN[i][j - 1] + 1
+                if j > k:
+                    if mapa[i][j - k - 1] != 0:
+                        countOfN[i][j] = countOfN[i][j - 1] - 1
+
+    endTime = time.time()
+    print("alternate:", (endTime - startTime)*1000, "ms")
 
     countCoveregeOfHouses(houseCoordinates)
     return count
@@ -155,22 +195,24 @@ def main(mapa):
 def countCoveregeOfHouses(houseCoordinates):
 
     i = 0
-    timeLine = 0
+    timeOnLine = 0
 
-    for x in houseCoordinates:
+    for x in range(1):
         startTime = time.time()
-        if i > 4000:
-            break
-        for y in houseCoordinates[x]:
+        for y in houseCoordinates[0]:
             if i == 0:
-                lastCoor = [x, y]
-            lastCoor = houseCoordinates[x][y].countNeighbours(
+                lastCoor = [0, y]
+            lastCoor = houseCoordinates[0][y].countNeighbours(
                 houseCoordinates, lastCoor, 500)
+
             i += 1
         endTime = time.time()
-        timeLine += (endTime - startTime)*1000
+        print("line done in:", (endTime - startTime)*1000)
+        timeOnLine += (endTime - startTime)*1000
 
-    print("avarage time per line:", timeLine/4001)
+    print("avarage time per line:", timeOnLine/16384)
+
+# def goOverHouses():
 
 
 print("start")
@@ -187,7 +229,6 @@ startTime = time.time()
 # print(mapa)
 
 result = main(mapa)
-mapa = []
 print(result)
 
 
