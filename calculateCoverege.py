@@ -183,9 +183,9 @@ def formatResult(result):
 print("start")
 startTime = time.time()
 
-mapa = init()
+#mapa = init()
 # createTestMap([11, 12356], [26, 12376])
-#mapa = initTest()
+mapa = initTest()
 
 endTime = time.time()
 print("done init in:", (endTime - startTime)*1000, "ms")

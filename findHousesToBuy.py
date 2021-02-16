@@ -30,18 +30,18 @@ class House:
 
 
 def findHousesToBuy(houseCoordinates, k):
-    #housesToBuy = []
+    housesToBuy = []
     print("start search")
-    maxCoor = findMax(houseCoordinates)
-    # for i in range(10000):
-    #    print(i)
-
-    #    if maxCoor[0] == -1:
-    #        print("ended before 10,000")
-    #        break
-    #    houseCoordinates[maxCoor[0]][maxCoor[1]].updateCoverage(houseCoordinates, k)
-    #    housesToBuy.append(maxCoor)
-    return houseCoordinates[maxCoor[0]][maxCoor[1]]
+    for i in range(10000):
+        print(i)
+        maxCoor = findMax(houseCoordinates)
+        if maxCoor[0] == -1:
+            print("ended before 10,000")
+            break
+        houseCoordinates[maxCoor[0]][maxCoor[1]
+                                     ].updateCoverage(houseCoordinates, k)
+        housesToBuy.append(maxCoor)
+    return housesToBuy
 
 
 def findMax(houseCoordinates):
@@ -51,8 +51,8 @@ def findMax(houseCoordinates):
     for i in houseCoordinates:
         for j in houseCoordinates[i]:
             if not houseCoordinates[i][j].isCovered:
-                if maximum < houseCoordinates[i][j].x:
-                    maximum = houseCoordinates[i][j].x
+                if maximum < houseCoordinates[i][j].numberOfNeighbours:
+                    maximum = houseCoordinates[i][j].numberOfNeighbours
                     maxCoor = [i, j]
     endTime = time.time()
     print("found Max:", (endTime - startTime)*1000, "ms")
@@ -60,13 +60,16 @@ def findMax(houseCoordinates):
 
 
 def readSavedDict():
-    f = open("/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/outputs/210215-20-29-52-out.txt", "r")
+    f = open("/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/mezivypocetTest.txt", "r")
     houseCoordinates = {}
     for i in f:
         line = list(map(int, i.split(" ")))
         # print(line)
-        houseCoordinates[(line[0], line[1])] = House(
+        if not(line[0] in houseCoordinates):
+            houseCoordinates[line[0]] = {}
+        houseCoordinates[line[0]][line[1]] = House(
             line[0], line[1], line[2])
+        houseCoordinates[line[0]][line[1]].numberOfNeighbours = line[3]
     return houseCoordinates
 
 
@@ -79,6 +82,14 @@ def saveOutput(outputContent):
     f.close()
 
 
+def formatResult(result):
+    out = "" + str(len(result)) + "\n"
+    for i in range(len(result)):
+        house = result[i]
+        out += str(house[0]) + " " + str(house[1]) + "\n"
+    return out
+
+
 print("start")
 startTime = time.time()
 
@@ -89,9 +100,10 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 
 startTime = time.time()
 
-#outputContent = formatResult(result)
+result = findHousesToBuy(houseCoor, 500)
+# print(result)
+outputContent = formatResult(result)
 
-
-# saveOutput(outputContent)
+saveOutput(outputContent)
 endTime = time.time()
 print("done main in", (endTime - startTime)*1000, "ms")
