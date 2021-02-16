@@ -3,4 +3,3 @@ include/
 lib/
 .DS_Store
 tutorial-env/01.in
-outputs/
