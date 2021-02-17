@@ -45,14 +45,19 @@ def findHousesToBuy(houseCoordinates, k):
 
 
 def findMax(houseCoordinates):
-    maximum = 0
+    minimum = -1
     maxCoor = [-1, -1]
     startTime = time.time()
     for i in houseCoordinates:
         for j in houseCoordinates[i]:
             if not houseCoordinates[i][j].isCovered:
-                if maximum < houseCoordinates[i][j].numberOfNeighbours:
-                    maximum = houseCoordinates[i][j].numberOfNeighbours
+                ratio = houseCoordinates[i][j].price / \
+                    houseCoordinates[i][j].numberOfNeighbours
+                if minimum == -1:
+                    minimum = ratio
+                    maxCoor = [i, j]
+                if minimum > ratio:
+                    minimum = ratio
                     maxCoor = [i, j]
     endTime = time.time()
     print("found Max:", (endTime - startTime)*1000, "ms")
@@ -60,7 +65,7 @@ def findMax(houseCoordinates):
 
 
 def readSavedDict():
-    f = open("/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/mezivypocetTest.txt", "r")
+    f = open("/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/mezivypocet.txt", "r")
     houseCoordinates = {}
     for i in f:
         line = list(map(int, i.split(" ")))
@@ -101,7 +106,7 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 startTime = time.time()
 
 result = findHousesToBuy(houseCoor, 500)
-# print(result)
+print(result)
 outputContent = formatResult(result)
 
 saveOutput(outputContent)
