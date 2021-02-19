@@ -55,7 +55,7 @@ def initTest():
     return mapa
 
 
-def main(mapa, k):
+def main(mapa, loadedInput, k):
     print('starting algorithm')
     numberRows = len(mapa)
     numberCollumns = len(mapa[0])
@@ -67,12 +67,17 @@ def main(mapa, k):
 
             if housePrice != 0:
                 if cell in houseCoor:
-                    if housePrice < houseCoor[cell].price:
+                    minimum = houseCoor[cell].price / \
+                        houseCoor[cell].numberOfNeighbours
+                    ratio = loadedInput[x][y].price / \
+                        loadedInput[x][y].numberOfNeighbours
+                    if minimum > ratio:
                         houseCoor[cell].price = housePrice
                         houseCoor[cell].x = x
                         houseCoor[cell].y = y
                 else:
                     houseCoor[cell] = House(x, y, housePrice)
+                    houseCoor[cell].numberOfNeighbours = loadedInput[x][y].numberOfNeighbours
 
     return houseCoor
 
@@ -83,6 +88,21 @@ def formatResult(result):
         house = i
         out += str(result[house].x) + " " + str(result[house].y) + "\n"
     return out
+
+
+def readSavedDict():
+    f = open(
+        "/Users/ondrej/workspace/code/ksp-h-20/ksp-h-210221/ksp-h-210221-04-py/mezivypocet.txt", "r")
+    houseCoordinates = {}
+    for i in f:
+        line = list(map(int, i.split(" ")))
+        # print(line)
+        if not(line[0] in houseCoordinates):
+            houseCoordinates[line[0]] = {}
+        houseCoordinates[line[0]][line[1]] = House(
+            line[0], line[1], line[2])
+        houseCoordinates[line[0]][line[1]].numberOfNeighbours = line[3]
+    return houseCoordinates
 
 
 def saveOutput(outputContent):
@@ -98,6 +118,7 @@ print("start")
 startTime = time.time()
 
 mapa = init()
+houseCoor = readSavedDict()
 # createTestMap([11, 12356], [26, 12376])
 #mapa = initTest()
 
@@ -106,8 +127,8 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 
 startTime = time.time()
 
-result = main(mapa, 500)
-print(result)
+result = main(mapa, houseCoor, 500)
+# print(result)
 outputContent = formatResult(result)
 
 

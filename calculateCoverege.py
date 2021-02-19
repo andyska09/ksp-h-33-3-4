@@ -46,7 +46,7 @@ def init():
 
 
 def initTest():
-    f = open("test02.txt", "r")
+    f = open("test03.txt", "r")
     mapa = []
     for i in f:
         mapa.append([i])
@@ -192,7 +192,7 @@ print("done init in:", (endTime - startTime)*1000, "ms")
 
 startTime = time.time()
 
-result = main(mapa, 500)
+result = main(mapa, 2)
 # print(result)
 outputContent = formatResult(result)
 
