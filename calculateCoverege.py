@@ -46,7 +46,7 @@ def init():
 
 
 def initTest():
-    f = open("test03.txt", "r")
+    f = open("test02.txt", "r")
     mapa = []
     for i in f:
         mapa.append([i])

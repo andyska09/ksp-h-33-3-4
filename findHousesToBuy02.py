@@ -114,17 +114,13 @@ def findMax(houseCoor):
     for i in houseCoor:
         for j in houseCoor[i]:
             if houseCoor[i][j].numberOfNeighbours != 0:
-                ratio = houseCoor[i][j].price / \
-                    houseCoor[i][j].numberOfNeighbours
+
                 if minimum == -1:
-                    minimum = ratio
+                    minimum = houseCoor[i][j].price
                     maxCoor = [i, j]
-                elif minimum > ratio:
-                    minimum = ratio
-                    maxCoor = [i, j]
-                elif minimum == ratio:
+                elif houseCoor[i][j].price <= minimum:
                     if houseCoor[i][j].numberOfNeighbours > houseCoor[maxCoor[0]][maxCoor[1]].numberOfNeighbours:
-                        minimum = ratio
+                        minimum = houseCoor[i][j].price
                         maxCoor = [i, j]
     endTime = time.time()
     print("found Max:", (endTime - startTime)*1000, "ms", maxCoor)
